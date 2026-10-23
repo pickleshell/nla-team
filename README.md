@@ -4,32 +4,31 @@
   NLA Team
 </h1>
 
-**Persistent teams of AI agents that coordinate work, preserve knowledge, and deliver results for independent review.**
+<p align="center"><strong>Your next engineering team is a team of agents.</strong><br>Agile teams · MCP tools · RAG memory · Independent review</p>
 
-NLA Team extends [Next Level Agent (NLA)](https://github.com/pickleshell/next-level-agent) from an individual engineering agent into a team of persistent collaborators. A Team Lead coordinates the objective, specialized employees own bounded assignments, and an independent reviewer checks the integrated result.
+**Give the team a goal. Follow the work. Review the result.**
 
-The aim is to make longer engineering work manageable across multiple agents and sessions: clear ownership, explicit communication, recoverable state, and evidence that can be inspected by a human.
+NLA Team brings the structure of an engineering organization to AI agents: a Team Lead, specialist employees, shared knowledge, and independent review. Built on [Next Level Agent](https://github.com/pickleshell/next-level-agent), it connects persistent agents to tools and services through MCP integrations, with durable communication between teammates.
 
-> **Experimental · Architecture preview**
->
-> This repository describes the architecture, operating principles, and development experience. It does not contain the private implementation, model credentials, deployment configuration, or an installable release. The working implementation is being tested privately. Publication of this overview is not a commitment to a source-release date.
+**One objective → clear ownership → parallel execution → reviewed delivery.**
 
-## From one agent to a team
+> **Architecture preview · Private testing** — This repository presents the concept and architecture. Implementation source and installation packages are not published here.
 
-An NLA employee is an agent instance with its own working context, persistent state, tools, and model configuration. It can perform an assignment through its own internal **Orchestra**: specialist roles such as Explorer, Architect, Implementer, Test Writer, Reviewer, and Supervisor.
+## The concept at a glance
 
-NLA Team adds coordination between these employees. An internal role invocation is not an additional persistent employee, and an employee's internal review does not replace independent review of the team's delivery.
-
-| Level | Responsibility |
+| Building block | What it brings |
 | --- | --- |
-| Human owner / operator | Defines objectives, priorities, constraints, and acceptance intent; controls deployment and access |
-| Team Lead | Decomposes work, assigns ownership, negotiates interfaces, coordinates dependencies, integrates results, and escalates blockers |
-| NLA employee | Owns a bounded engineering assignment and its evidence; communicates with colleagues |
-| Employee Orchestra | Routes internal work to suitable specialist roles and models |
-| Independent reviewer | Examines the exact delivered artifact and checks claims independently |
-| Team Core | Provides durable communication and scoped memory access; does not make engineering decisions |
+| **Agile AI Teams** | Persistent specialists with responsibilities, a shared objective, and a Team Lead |
+| **MCP integrations** | A common tool interface for connecting agents to supported services and capabilities |
+| **Scrum / Kanban workflows** | Backlog, work packages, Definition of Ready/Done, review and feedback—adapted to the project |
+| **RAG-style project memory** | Retrieve relevant, reviewed knowledge instead of rebuilding context from scratch |
+| **Model Orchestras** | Select models and specialist roles for each employee's internal work |
+| **NLA Lab** | Inspect conversations, summaries, handoffs and operational status |
+| **Independent review** | Check the actual delivery, with evidence and reproducible results |
 
-## Architecture
+## Architecture: teams above models, tools behind interfaces
+
+An **NLA employee** is a persistent agent, not just a model call. It has its own context, tools, working state and internal Orchestra. A **Team** coordinates several employees around a project.
 
 ```mermaid
 flowchart TB
@@ -61,47 +60,37 @@ flowchart TB
     Gateway --> Memory[("Mem0<br/>Private and curated project knowledge")]
     Core -->|observations| Lab["NLA Lab<br/>Conversations, summaries and status views"]
     Lab --> Human
+    Developer --> MCP["MCP servers<br/>Tools, services and integrations"]
+    Architect --> MCP
+    Reviewer --> MCP
     Developer --> Artifacts["Versioned artifacts<br/>Changes, tests and reports"]
     Artifacts --> Reviewer
 ```
 
-The arrows show responsibilities and information flow, not a centrally enforced sequence of model calls. Team composition varies by project; the diagram is a representative arrangement.
+- **Team Lead** decomposes the objective, assigns ownership, resolves dependencies and integrates results.
+- **Employees** own assignments end to end. Their internal Orchestra can explore, plan, implement, test and review.
+- **Independent reviewers** check the delivered revision; an employee's self-review is not final acceptance.
+- **Team Core** persists messages, inboxes and coordination state. It is infrastructure, not another model or a central workflow brain.
+- **MCP servers** expose connected tools. **ACP** carries explicit messages between employees through Core. Native tools and APIs remain part of the implementation; MCP is not the transport for every internal operation.
+- **The human owner** sets direction, acceptance intent and deployment authority.
 
-### Team Core is infrastructure
+The diagram shows a representative team. Roles and team size follow the work.
 
-Each team has a separate Core and persistent coordination state. Core carries the **Agent Communication Protocol (ACP)**: explicit conversations, messages, and employee inboxes. Employees may communicate directly with one another through this channel.
+## Agile teams, without unnecessary ceremony
 
-Core is not the Team Lead, an LLM, or a universal workflow engine. It does not interpret every message into a mandatory next action. Employee provisioning and credentials are managed separately by the operator; Core does not require Docker control.
+Organize work as a sprint, a Kanban flow, or a simple delivery cycle:
 
-A persisted message and an actively executing employee are different states. An idle notification can prompt an employee to inspect its inbox, but the delivery and execution boundary still needs observation and recovery.
+**Backlog → clarify → assign → implement → review → integrate → feedback.**
 
-### Persistent employees, replaceable processes
+The Team Lead coordinates dependencies. Employees ask each other questions and report blockers. A useful handoff includes the exact artifact, verification results, remaining limitations and the next owner.
 
-Employees retain their working state and conversation history across process or container replacement. Stable identities and persistent storage are essential: recreating a process should not silently create a different employee or project.
+Scrum and Kanban describe operating practices—not a claim that Core implements every ceremony, board or automatic transition. The goal is useful delivery, not more meetings between models.
 
-Persistence is not perfect recall. Context summaries, structured checkpoints, repository state, and memory have different purposes. Recovery must reconcile them with current artifacts rather than treating an old summary as proof that the work is still complete.
+## Example: several groups, one outcome
 
-### Memory with explicit scope
+**“Build a searchable internal knowledge portal with controlled access.”**
 
-Employees have private knowledge; projects have curated shared knowledge. An employee can offer a fact for sharing, and the Team Lead can explicitly promote a reviewed fact into project memory. Provenance records connect shared knowledge to its source and promotion decision.
-
-One memory service can support many teams without merging all their memories. Messages are not automatically converted into authoritative project knowledge. Memory availability is also separate from communication: a memory-service outage should not prevent colleagues from exchanging messages.
-
-The current implementation assumes a trusted deployment. Namespace checks and scoped APIs should not be mistaken for a proven boundary against arbitrary code with network access to an unprotected backing service.
-
-### Observation through NLA Lab
-
-Lab presents team conversations and operational information, with derived summaries for easier reading. Original messages remain available for inspection. Viewing a conversation should not acknowledge it on an employee's behalf.
-
-Infrastructure health, model availability, work in progress, and accepted delivery must be reported separately. A running container is not evidence of useful progress, and a fluent summary is not acceptance evidence.
-
-## Working through groups
-
-Several teams can contribute to a larger objective while keeping separate ownership and working state. A department-level grouping is an organizational pattern; this preview does not claim an implemented automatic cross-team dispatcher.
-
-The following example is illustrative, not a report of a completed deployment.
-
-**Objective:** “Build a searchable internal knowledge portal with controlled access and a clear operations handover.”
+An architecture group defines the interfaces. Service and experience teams work in parallel. Independent quality review tests their integrated candidate. Operations prepares the handover.
 
 ```mermaid
 flowchart LR
@@ -124,74 +113,67 @@ flowchart LR
     Delivery -->|evidence and remaining limits| Owner
 ```
 
-1. **Agree on the work.** The owner describes the desired outcome. Architecture clarifies interfaces, dependencies, unanswered questions, and observable acceptance criteria.
-2. **Assign ownership.** Each Team Lead turns its part into bounded employee assignments. Parallel work starts where the agreed interfaces make it independent.
-3. **Communicate explicitly.** Employees ask questions, report blockers, and negotiate changes through durable messages. Shared memory supplies reviewed background, not hidden instructions.
-4. **Hand off artifacts.** A developer supplies the exact revision, changed files, verification commands, results, and known limitations. The recipient must actually have access to that artifact.
-5. **Review independently.** Quality checks the delivered revision in a reproducible environment. Missing files, incompatible interfaces, or failed checks return as concrete findings.
-6. **Integrate and accept.** Leads coordinate corrections. The owner receives a result with evidence and unresolved limitations. Publication or deployment follows the authority granted for the task.
+This is an illustrative organization pattern, not a completed deployment or an automatic cross-team dispatcher. Each group keeps explicit ownership; agreed contracts make parallel work possible.
 
-For example, “the search endpoint is ready” is insufficient. A useful handoff identifies the revision, API contract, passing checks, remaining pagination limitation, and the location of the artifact to review.
+The same pattern supports research, architecture, implementation, testing and operations. Begin with a small team; add a group when the work is genuinely separable.
 
-## Architectural principles
+## MCP: connect the team to its tools
 
-- **Ownership before parallelism.** Every work package has an owner, an interface, and a reviewable result. Adding agents does not resolve ambiguous responsibility.
-- **Explicit communication.** Team decisions travel through identifiable messages. An employee's private context is not implicitly available to everyone else.
-- **Evidence before completion claims.** Artifacts and checks take precedence over summaries. Independent review targets the actual candidate, not a developer's description of it.
-- **Durability with reconciliation.** Conversations and state persist, but resumed work must account for repository changes and incomplete recovery.
-- **Model choice by role.** Employees can use different models for routine work, coordination, architecture, and review. Configured fallback is not proof of a successful live provider call.
-- **Project separation.** Teams keep distinct identities, coordination state, and memory scope. Shared infrastructure need not mean shared authority.
-- **Human control.** Objectives, credentials, deployment boundaries, and consequential approvals remain explicit. Team Core does not grant itself new authority.
-- **Visible limitations.** A blocked task stays distinguishable from a completed one. Unknown evidence must remain unknown.
+The architectural direction is straightforward: **give agents well-defined capabilities through MCP servers** instead of embedding every external integration into the coordinator.
 
-## What private testing has shown
+An MCP integration can expose an external service or a bounded operation; NLA employees decide when to use the tools available to their role. Team management also has MCP-facing views alongside CLI and dashboard access.
 
-The implementation is under active private testing on engineering workloads. These are maintainer-observed results, not an independent benchmark or a production reliability guarantee.
+Tool availability is explicit. Connecting a server does not prove its operations work, and not every employee needs every tool. Integration checks should exercise the actual endpoint and distinguish a successful call from a completed task.
 
-| Area | Observed result | Limit of the evidence |
-| --- | --- | --- |
-| Team communication | Persistent conversations, employee inboxes, direct questions and coordination messages have been exercised | Message delivery alone does not guarantee the recipient starts work |
-| Engineering handoffs | Teams have produced versioned changes, integration candidates and independent review findings | A handoff can still omit an artifact or include evidence from an uncommitted worktree |
-| Collective memory | Private and project scopes, explicit promotion and provenance have been tested | Memory quality depends on what is stored and reviewed |
-| Observation | Conversations and derived summaries are available through Lab | Summaries can lag or overstate progress unless checked against source evidence |
-| Employee replacement | A recent maintenance run updated 43 employee instances across 13 teams and restored their prior sessions; infrastructure checks passed | This is an operations result, not proof that 43 agents were simultaneously performing useful work |
-| Context recovery | A missing-checkpoint failure was reproduced and patched; regression checks cover recovery and blocked failure cases | Longer live runs and provider-specific recovery behavior still need continued testing |
+## RAG memory: knowledge that survives the conversation
 
-The employee count describes one test environment. It is not a requirement, recommended team size, or claim of linear productivity gains. This preview does not publish a controlled productivity, cost, or model-quality benchmark.
+Project memory follows a retrieval-augmented pattern: agents search for relevant facts and bring them into the current task. Mem0 provides semantic memory behind Core's Memory Gateway.
 
-## Advantages and current limitations
+**Private knowledge → proposed shared fact → Lead review → project memory.**
 
-The practical advantages are durable coordination, visible ownership, parallel work across agreed boundaries, independent review, and reusable project knowledge. Separate employees also allow model and tool choices to reflect the assignment rather than forcing every task through one configuration.
+Shared knowledge carries provenance. Messages do not automatically become accepted facts, and separate teams do not silently share every memory. An unavailable memory service does not stop team communication.
 
-These benefits bring costs and failure modes that are part of the ongoing work:
+Memory, conversation summaries and execution checkpoints serve different purposes. On recovery, an employee reconciles them with current artifacts. Remembering a claim is not the same as verifying it.
 
-| Limitation | Practical impact | Development focus |
-| --- | --- | --- |
-| Idle handoff gaps | A sender can finish while the recipient never starts | Observable delivery, recipient readiness and explicit recovery |
-| Divergent implementations | Separate workers can produce incompatible interpretations of an interface | Interface agreements, ownership boundaries and integration review |
-| Unreliable completion summaries | A model may report success despite failed criteria or partial execution | Runtime evidence and precise result categories |
-| Context recovery failures | Missing checkpoints or unsuccessful restoration can interrupt long sessions | Runtime checkpointing, reconciliation and meaningful error reporting |
-| Provider and model variability | Tool use, latency, limits and fallback behavior vary | Real role-level tests, bounded retries and explicit fallback evidence |
-| Coordination overhead | More employees can increase messages, cost and integration effort | Smaller effective teams and measurement of useful outcomes |
-| Deployment assumptions | Trusted-network setups are not hardened multi-tenant services | Clear boundaries and deployment-specific controls |
+## What testing shows
 
-NLA Team is not presented as an unattended organization that reliably completes arbitrary projects. Operator intervention is still needed in some failure and integration cases. The goal is to make those cases visible, reproducible, and progressively easier to recover from.
+The working implementation is being tested privately on engineering workloads. Maintainer-observed results include:
 
-## Participate in testing
+- Durable conversations, employee inboxes and direct coordination between agents.
+- Versioned implementation handoffs, integration candidates and independent review findings.
+- Private/project memory scopes with explicit promotion and provenance.
+- Lab observation with summaries and original messages available for inspection.
+- A maintenance run across **43 employees in 13 teams**, with prior sessions restored and infrastructure checks passing.
+- Reproduction and repair of a missing-checkpoint recovery failure, backed by regression tests.
 
-We are interested in conversations with people who would like to:
+These are practical development results, not an independent benchmark. The employee count does not establish concurrent useful work, productivity gains or a recommended team size.
 
-- participate in private testing with a concrete engineering workflow;
-- review the architecture or study multi-agent coordination and recovery;
-- compare role orchestration, model reliability, cost, and delivery quality;
-- discuss integrations, collaboration, or other questions about NLA Team.
+## Why it matters—and what still needs work
 
-If you have access to this repository, [open an issue](https://github.com/pickleshell/nla-team/issues) with your use case, environment, and what you would like to evaluate. Please leave credentials and confidential project material out of the report. Testing access is arranged individually; this repository does not provide a self-service installation.
+**Continuity. Parallelism. Accountability.** Persistent employees retain working context; clear interfaces let teams divide work; independent review makes results inspectable.
 
-## Project relationship and publication scope
+The system is still experimental:
 
-NLA Team is developed as the team-coordination layer around **Next Level Agent**. See the [NLA repository](https://github.com/pickleshell/next-level-agent) for the individual-agent project and its own release status, upstream acknowledgements, and licensing information.
+| Current challenge | What we are improving |
+| --- | --- |
+| A delivered message may not start the next employee | Handoff visibility and recovery |
+| Parallel workers may diverge on interfaces | Ownership, contract agreement and integration checks |
+| Model summaries can overstate success | Evidence-based status and independent acceptance |
+| Context or provider failures can interrupt work | Checkpointing, restoration and bounded fallback |
+| More agents can increase cost and coordination overhead | Small effective teams and measurement of useful outcomes |
 
-This architecture preview is separate from the private implementation repository. Documentation here does not publish that implementation or grant access to it. There are no application sources, deployment scripts, model weights, or credentials in this repository.
+Operator intervention is still needed in some cases. Current trusted-deployment assumptions are not a claim of hardened multi-tenant isolation. Neither healthy containers nor fluent reports prove autonomous completion.
 
-*Architecture preview updated October 2026. Capabilities and limitations will be revised as testing produces new evidence.*
+## Join the testing conversation
+
+**Building with agents? Help shape how they work together.**
+
+We welcome private testers, architecture reviewers and integration collaborators. Bring a concrete workflow, a difficult handoff, or a recovery scenario worth testing.
+
+If you have repository access, [open an issue](https://github.com/pickleshell/nla-team/issues) to discuss testing, collaboration or other questions. Describe your use case and environment; leave credentials and confidential material out. Access is arranged individually.
+
+---
+
+**NLA Team** is the team-coordination layer around [Next Level Agent](https://github.com/pickleshell/next-level-agent). The individual-agent repository documents its own release status, upstream acknowledgements and licensing. This separate architecture preview contains no implementation sources, deployment scripts or model weights. No source-release date is promised.
+
+*Architecture preview · October 2026*
