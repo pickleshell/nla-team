@@ -6,7 +6,7 @@
 
 <p align="center"><strong>Your next engineering team is a team of agents.</strong><br>Agile teams · MCP tools · RAG memory · Independent review</p>
 
-**Give the team a goal. Follow the work. Review the result.**
+> **Give the team a goal. Follow the work. Review the result.**
 
 NLA Team brings the structure of an engineering organization to AI agents: a Team Lead, specialist employees, shared knowledge, and independent review. Built on [Next Level Agent](https://github.com/pickleshell/next-level-agent), it connects persistent agents to tools and services through MCP integrations, with durable communication between teammates.
 
