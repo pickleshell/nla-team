@@ -1,4 +1,8 @@
-# NLA Team
+<h1 align="center">
+  <img src="nla-team.png" alt="NLA Team logo" width="160">
+  <br>
+  NLA Team
+</h1>
 
 **Persistent teams of AI agents that coordinate work, preserve knowledge, and deliver results for independent review.**
 
