@@ -45,6 +45,82 @@ flowchart TB
 | **Persistent state** | Checkpoints · Session recovery · Continuity |
 | **Independent review** | Exact artifacts · Reproducible checks · Honest results |
 
+## Agent → Team → Lab
+
+**One employee is already an agent system.** Each NLA instance can orchestrate specialist roles, delegate work and review results. NLA Team coordinates these persistent employees; the Lab ecosystem adds observation and a developing cross-team management loop.
+
+| Layer | Responsibility |
+| --- | --- |
+| **Next Level Agent** | Individual execution · Internal model orchestra · Context continuity |
+| **NLA Team** | Team Lead · Persistent employees · ACP coordination · Independent review |
+| **NLA Lab ecosystem** | Cross-team visibility · Evidence · Proposed autonomous process management |
+
+### Conceptual organization
+
+The following diagram expresses the **target vision**, not a list of shipped capabilities. “Supervisor” names the supervisory layer; its reasoning and enforcement responsibilities are separated in the operational design below.
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                                NLA Lab                                 │
+│                                                                        │
+│  ┌──────────────────────────────────────────────────────────────────┐  │
+│  │                            SUPERVISOR                            │  │
+│  │   • State & Ledger Tracker      • Risk Interceptor & Sandbox     │  │
+│  │   • Token/Budget Policy Manager • Global Health & Anti-Loop      │  │
+│  └─────────────────────────────────┬────────────────────────────────┘  │
+│                                    │                                   │
+│                       (Event Bus / RPC Control Channel)                 │
+│          ┌─────────────────────────┴────────────────────────┐          │
+│          ▼                                                  ▼          │
+│   ┌──────────────┐                                   ┌──────────────┐  │
+│   │   NLA Team   │                                   │   NLA Team   │  │
+│   │ ┌──────────┐ │                                   │ ┌──────────┐ │  │
+│   │ │  NLA #1  │ │                                   │ │  NLA #1  │ │  │
+│   │ └──────────┘ │                                   │ └──────────┘ │  │
+│   │ ┌──────────┐ │                                   │ ┌──────────┐ │  │
+│   │ │  NLA #2  │ │                                   │ │  NLA #2  │ │  │
+│   │ └──────────┘ │                                   │ └──────────┘ │  │
+│   └──────────────┘                                   └──────────────┘  │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+### Operational boundaries
+
+**Lab observes. Manager reasons. Controller and Gateway enforce. Leads coordinate delivery.**
+
+```text
+             User: goals, authority, escalated decisions
+                                │
+                     Autonomy Controller
+              Schedule · Journal · Budgets · No overlap
+                                │
+                          NLA Manager
+                 Assess progress · Resolve blockers
+                         │              ▲
+                  Control Gateway       │ Read-only MCP
+                         │           NLA Lab
+                         ▼       State · History · Evidence
+                      Team Lead
+                         │
+                 ┌───────┼───────┐
+                 ▼       ▼       ▼
+                NLA     NLA     NLA
+               Build   Test    Independent review
+                 │
+          Internal model orchestra
+```
+
+The management loop is being implemented and validated. The existing **Lab MCP remains read-only**; coordination actions use a separate scoped gateway. Team Core remains authoritative for team records.
+
+- **Evidence before intervention:** freshness, provenance and incomplete observations remain visible.
+- **Lead-owned execution:** Manager coordinates enrolled teams through their Leads.
+- **Bounded autonomy:** scoped actions, durable obligations and explicit escalation.
+- **No blind replacement:** an invocation with an unknown outcome blocks replacement until reconciliation.
+
+A journal is **not** automatic rollback of files or external effects. Dynamic team resizing, universal risk interception and guaranteed anti-loop recovery are not claimed as implemented. Reliable cancellation/quiescence and confirmed external operator notification remain release gates for unattended operation.
+
+The objective is measurable: **less operator prompting, verified recovery from stalled work, and completed tasks backed by evidence.** Architectural scope alone is not proof of superiority over another framework.
+
 ## Several groups. One outcome.
 
 Illustrative workflow: **build an internal knowledge portal**.
