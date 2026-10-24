@@ -18,20 +18,47 @@ Persistent AI employees built on [Next Level Agent](https://github.com/pickleshe
 
 ```mermaid
 flowchart TB
-    Owner["You<br/>Goal · Priorities · Acceptance"] --> Lead["Team Lead<br/>Plan · Delegate · Integrate"]
-    Lead --> Architect["Architect"]
-    Lead --> Developer["Developer"]
-    Lead --> Reviewer["Independent Reviewer"]
-    Architect <--> Core["Team Core<br/>ACP messages · Durable state"]
-    Developer <--> Core
-    Reviewer <--> Core
-    Lead <--> Core
-    Core --> Memory[("RAG-style memory<br/>Private · Curated project knowledge")]
-    Core --> Lab["NLA Lab<br/>Conversations · Summaries · Status"]
-    Architect --> MCP["MCP servers<br/>Connected tools & services"]
-    Developer --> MCP
-    Reviewer --> MCP
-    Lab --> Owner
+    Goal["You set the goal<br/>Priorities · Acceptance criteria"]
+    Lead["Team Lead<br/>Plan · Delegate · Integrate"]
+    Goal --> Lead
+    subgraph Specialists["Persistent NLA employees"]
+        direction LR
+        Architect["Architect<br/>Design the solution"]
+        Developer["Developer<br/>Build and test"]
+        Reviewer["Independent Reviewer<br/>Check the evidence"]
+    end
+    Lead --> Architect
+    Lead --> Developer
+    Lead --> Reviewer
+    Architect --> Result["Integrated result<br/>Artifacts · Tests · Review findings"]
+    Developer --> Result
+    Reviewer --> Result
+    Result --> Acceptance["You review the result"]
+
+    classDef human fill:#e8f2ee,stroke:#4d7c6a,color:#17212b
+    classDef coordination fill:#243447,stroke:#64748b,color:#ffffff
+    classDef employee fill:#edf2f7,stroke:#64748b,color:#17212b
+    class Goal,Acceptance human
+    class Lead,Result coordination
+    class Architect,Developer,Reviewer employee
+```
+
+The Lead coordinates corrections and integration; independent review supplies evidence for acceptance.
+
+**Shared infrastructure — available throughout the workflow:**
+
+```mermaid
+flowchart TB
+    Team["NLA Team"]
+    Team --- Core["Team Core · ACP<br/>Messages & durable state"]
+    Team --- Tools["MCP servers<br/>Tools & services"]
+    Team --- Memory["RAG-style memory<br/>Private & curated project knowledge"]
+    Core --> Lab["NLA Lab<br/>Observe progress & inspect history"]
+
+    classDef service fill:#edf2f7,stroke:#64748b,color:#17212b
+    classDef coordination fill:#243447,stroke:#64748b,color:#ffffff
+    class Team coordination
+    class Core,Tools,Memory,Lab service
 ```
 
 **MCP connects tools. ACP connects teammates.** Native tools and APIs remain supported.
