@@ -59,55 +59,65 @@ flowchart TB
 
 The following diagram expresses the **target vision**, not a list of shipped capabilities. “Supervisor” names the supervisory layer; its reasoning and enforcement responsibilities are separated in the operational design below.
 
-```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                                NLA Lab                                 │
-│                                                                        │
-│  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │                            SUPERVISOR                            │  │
-│  │   • State & Ledger Tracker      • Risk Interceptor & Sandbox     │  │
-│  │   • Token/Budget Policy Manager • Global Health & Anti-Loop      │  │
-│  └─────────────────────────────────┬────────────────────────────────┘  │
-│                                    │                                   │
-│                       (Event Bus / RPC Control Channel)                 │
-│          ┌─────────────────────────┴────────────────────────┐          │
-│          ▼                                                  ▼          │
-│   ┌──────────────┐                                   ┌──────────────┐  │
-│   │   NLA Team   │                                   │   NLA Team   │  │
-│   │ ┌──────────┐ │                                   │ ┌──────────┐ │  │
-│   │ │  NLA #1  │ │                                   │ │  NLA #1  │ │  │
-│   │ └──────────┘ │                                   │ └──────────┘ │  │
-│   │ ┌──────────┐ │                                   │ ┌──────────┐ │  │
-│   │ │  NLA #2  │ │                                   │ │  NLA #2  │ │  │
-│   │ └──────────┘ │                                   │ └──────────┘ │  │
-│   └──────────────┘                                   └──────────────┘  │
-└────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph LabVision["NLA Lab · Target vision"]
+        direction TB
+        Supervisor["SUPERVISOR<br/>State & ledger tracking · Risk interception & sandboxing<br/>Token & budget policies · Health & anti-loop controls"]
+        Channel["Event Bus / RPC Control Channel"]
+        Supervisor --> Channel
+        subgraph TeamA["NLA Team A"]
+            A1["NLA #1"]
+            A2["NLA #2"]
+        end
+        subgraph TeamB["NLA Team B"]
+            B1["NLA #1"]
+            B2["NLA #2"]
+        end
+        Channel --> TeamA
+        Channel --> TeamB
+    end
+    classDef management fill:#243447,stroke:#64748b,color:#ffffff
+    classDef employee fill:#edf2f7,stroke:#64748b,color:#17212b
+    class Supervisor,Channel management
+    class A1,A2,B1,B2 employee
 ```
 
 ### Operational boundaries
 
 **Lab observes. Manager reasons. Controller and Gateway enforce. Leads coordinate delivery.**
 
-```text
-             User: goals, authority, escalated decisions
-                                │
-                     Autonomy Controller
-              Schedule · Journal · Budgets · No overlap
-                                │
-                          NLA Manager
-                 Assess progress · Resolve blockers
-                         │              ▲
-                  Control Gateway       │ Read-only MCP
-                         │           NLA Lab
-                         ▼       State · History · Evidence
-                      Team Lead
-                         │
-                 ┌───────┼───────┐
-                 ▼       ▼       ▼
-                NLA     NLA     NLA
-               Build   Test    Independent review
-                 │
-          Internal model orchestra
+```mermaid
+flowchart TB
+    User["User<br/>Goals · Authority · Escalated decisions"]
+    Controller["Autonomy Controller<br/>Schedule · Journal · Budgets · No overlap"]
+    Manager["NLA Manager<br/>Assess progress · Resolve blockers"]
+    Gateway["Scoped Control Gateway<br/>Enforce action permissions"]
+    Observer["NLA Lab · Read-only observer<br/>State · History · Evidence"]
+    User --> Controller
+    Controller -->|Scheduled cycle| Manager
+    Observer -->|Read-only MCP| Manager
+    Manager --> Gateway
+    subgraph Team["NLA Team"]
+        Lead["Team Lead"]
+        Build["NLA<br/>Build"]
+        Test["NLA<br/>Test"]
+        Review["NLA<br/>Independent review"]
+        Orchestra["Internal model orchestra<br/>Within each NLA employee"]
+        Lead --> Build
+        Lead --> Test
+        Lead --> Review
+        Build -.-> Orchestra
+        Test -.-> Orchestra
+        Review -.-> Orchestra
+    end
+    Gateway --> Lead
+    classDef management fill:#243447,stroke:#64748b,color:#ffffff
+    classDef observer fill:#e8f2ee,stroke:#4d7c6a,color:#17212b
+    classDef employee fill:#edf2f7,stroke:#64748b,color:#17212b
+    class Controller,Manager,Gateway management
+    class Observer observer
+    class Lead,Build,Test,Review,Orchestra employee
 ```
 
 The management loop is being implemented and validated. The existing **Lab MCP remains read-only**; coordination actions use a separate scoped gateway. Team Core remains authoritative for team records.
