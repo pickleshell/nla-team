@@ -157,6 +157,8 @@ Human oversight remains necessary. Healthy processes do not prove completed work
 
 Have a workflow worth testing? Want to collaborate or ask a question? [Open an issue](https://github.com/pickleshell/nla-team/issues) if you have repository access, or visit the [maintainer’s GitHub profile](https://github.com/pickleshell).
 
+**Email:** [pickleshell.plugin@gmail.com](mailto:pickleshell.plugin@gmail.com)
+
 Testing access is arranged individually. **Implementation source remains private; no public release date is promised.**
 
 ---
